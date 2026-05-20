@@ -1,0 +1,40 @@
+name: Build Electron From ZIP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Extrair projeto.zip
+        shell: powershell
+        run: |
+          Expand-Archive -Path projeto.zip -DestinationPath extracted -Force
+
+      - name: Instalar dependências
+        shell: powershell
+        run: |
+          Set-Location extracted
+          npm install
+
+      - name: Gerar instalador
+        shell: powershell
+        run: |
+          Set-Location extracted
+          npm run build
+
+      - name: Publicar EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: Brasil-Solucoes-DTC-Lab-Windows
+          path: extracted/dist/**
